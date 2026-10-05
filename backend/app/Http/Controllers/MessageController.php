@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\MessageReply;
 
 class MessageController extends Controller
 {
@@ -34,5 +36,25 @@ class MessageController extends Controller
         $message = \App\Models\Message::findOrFail($id);
         $message->delete();
         return response()->json(null, 204);
+    }
+
+    public function reply(Request $request, string $id)
+    {
+        $request->validate([
+            'body' => 'required|string|min:1',
+        ]);
+
+        $message = \App\Models\Message::findOrFail($id);
+
+        Mail::to($message->email)->send(new MessageReply(
+            recipientName:   $message->name,
+            originalSubject: $message->subject ?? 'Your message',
+            replyBody:       $request->input('body'),
+        ));
+
+        // Mark as read after replying
+        $message->update(['is_read' => true]);
+
+        return response()->json(['sent' => true]);
     }
 }

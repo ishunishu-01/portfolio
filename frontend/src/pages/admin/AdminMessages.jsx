@@ -1,19 +1,24 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { MessageSquare, Trash2, Eye, X, Mail, User, Clock, CheckCircle, Circle } from 'lucide-react';
+import { MessageSquare, Trash2, Eye, X, Mail, User, Clock, CheckCircle, Circle, Reply, Send, Loader } from 'lucide-react';
 
 const API = 'http://localhost:8000/api';
 const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('admin_token')}` });
 
 export default function AdminMessages() {
-  const [items, setItems]     = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [items, setItems]       = useState([]);
+  const [loading, setLoading]   = useState(true);
   const [selected, setSelected] = useState(null);
-  const [alert, setAlert]     = useState(null);
+  const [alert, setAlert]       = useState(null);
 
-  useEffect(() => { fetch(); }, []);
+  // Reply modal state
+  const [replyTarget, setReplyTarget] = useState(null); // message to reply to
+  const [replyBody, setReplyBody]     = useState('');
+  const [replySending, setReplySending] = useState(false);
 
-  const fetch = async () => {
+  useEffect(() => { fetchMessages(); }, []);
+
+  const fetchMessages = async () => {
     try { const r = await axios.get(`${API}/messages`, { headers: headers() }); setItems(r.data); }
     catch { showAlert('Failed to load messages.', 'error'); }
     finally { setLoading(false); }
@@ -37,8 +42,36 @@ export default function AdminMessages() {
       await axios.delete(`${API}/messages/${id}`, { headers: headers() });
       showAlert('Message deleted.');
       if (selected?.id === id) setSelected(null);
-      fetch();
+      fetchMessages();
     } catch { showAlert('Delete failed.', 'error'); }
+  };
+
+  const openReply = (item) => {
+    setReplyTarget(item);
+    setReplyBody('');
+    setSelected(null); // close read modal if open
+  };
+
+  const handleSendReply = async () => {
+    if (!replyBody.trim()) return;
+    setReplySending(true);
+    try {
+      await axios.post(
+        `${API}/messages/${replyTarget.id}/reply`,
+        { body: replyBody },
+        { headers: headers() }
+      );
+      // mark as read in UI
+      setItems(prev => prev.map(m => m.id === replyTarget.id ? { ...m, is_read: true } : m));
+      showAlert(`Reply sent to ${replyTarget.email}!`);
+      setReplyTarget(null);
+      setReplyBody('');
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Failed to send reply. Check mail config.';
+      showAlert(msg, 'error');
+    } finally {
+      setReplySending(false);
+    }
   };
 
   const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
@@ -94,6 +127,7 @@ export default function AdminMessages() {
                       <td>
                         <div className="td-actions">
                           <button className="btn btn-secondary btn-sm btn-icon" onClick={() => handleRead(item)} title="Read"><Eye size={13} /></button>
+                          <button className="btn btn-primary btn-sm btn-icon" onClick={() => openReply(item)} title="Reply"><Reply size={13} /></button>
                           <button className="btn btn-danger btn-sm btn-icon" onClick={() => handleDelete(item.id)} title="Delete"><Trash2 size={13} /></button>
                         </div>
                       </td>
@@ -106,7 +140,7 @@ export default function AdminMessages() {
         </div>
       </div>
 
-      {/* Read modal */}
+      {/* ── Read modal ── */}
       {selected && (
         <div className="admin-modal-backdrop" onClick={e => e.target === e.currentTarget && setSelected(null)}>
           <div className="admin-modal admin-modal--wide">
@@ -125,7 +159,85 @@ export default function AdminMessages() {
             </div>
             <div className="admin-modal__footer">
               <button className="btn btn-danger" onClick={() => handleDelete(selected.id)}><Trash2 size={14} /> Delete</button>
-              <a href={`mailto:${selected.email}?subject=Re: ${selected.subject || 'Your message'}`} className="btn btn-primary"><Mail size={14} /> Reply via Email</a>
+              <button className="btn btn-primary" onClick={() => openReply(selected)}><Reply size={14} /> Reply</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Reply modal ── */}
+      {replyTarget && (
+        <div className="admin-modal-backdrop" onClick={e => e.target === e.currentTarget && setReplyTarget(null)}>
+          <div className="admin-modal admin-modal--wide">
+            <div className="admin-modal__header">
+              <h3><Reply size={16} /> Reply to {replyTarget.name}</h3>
+              <button className="btn btn-secondary btn-sm btn-icon" onClick={() => setReplyTarget(null)}><X size={15} /></button>
+            </div>
+
+            <div className="admin-modal__body">
+              {/* Thread preview */}
+              <div style={{
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                borderRadius: '10px',
+                padding: '1rem 1.25rem',
+                marginBottom: '1.25rem',
+              }}>
+                <div style={{ fontSize: '0.72rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.4rem' }}>
+                  Original message from {replyTarget.name}
+                </div>
+                <div style={{ fontSize: '0.85rem', color: '#94a3b8', lineHeight: 1.6 }}>
+                  <strong style={{ color: '#cbd5e1' }}>{replyTarget.subject}</strong>
+                  <br />
+                  {replyTarget.message}
+                </div>
+              </div>
+
+              {/* To / Subject info */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
+                <div className="msg-meta-row"><Mail size={13} /><strong>To:</strong> {replyTarget.email}</div>
+                <div className="msg-meta-row"><MessageSquare size={13} /><strong>Subject:</strong> Re: {replyTarget.subject || 'Your message'}</div>
+              </div>
+
+              {/* Reply textarea */}
+              <label style={{ fontSize: '0.8rem', fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.4rem' }}>
+                Your Reply *
+              </label>
+              <textarea
+                rows={8}
+                value={replyBody}
+                onChange={e => setReplyBody(e.target.value)}
+                placeholder={`Hi ${replyTarget.name},\n\nThank you for reaching out...`}
+                style={{
+                  width: '100%',
+                  padding: '0.85rem 1rem',
+                  background: 'var(--admin-bg)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: '10px',
+                  color: '#e2e8f0',
+                  fontSize: '0.9rem',
+                  lineHeight: 1.7,
+                  resize: 'vertical',
+                  outline: 'none',
+                  fontFamily: 'inherit',
+                  transition: 'border-color 0.15s',
+                }}
+                onFocus={e => e.target.style.borderColor = '#d4af37'}
+                onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+              />
+            </div>
+
+            <div className="admin-modal__footer">
+              <button className="btn btn-secondary" onClick={() => setReplyTarget(null)} disabled={replySending}>
+                Cancel
+              </button>
+              <button
+                className="btn btn-primary"
+                onClick={handleSendReply}
+                disabled={replySending || !replyBody.trim()}
+              >
+                {replySending ? <><Loader size={14} className="admin-spin" /> Sending…</> : <><Send size={14} /> Send Reply</>}
+              </button>
             </div>
           </div>
         </div>

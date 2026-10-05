@@ -4,12 +4,12 @@ import './Education.css';
 const educationList = [
   {
     id: 1,
-    institution: 'University / Institute Name',
-    degree:      'Bachelor of Science in Information Technology',
-    field:       'Information Technology',
-    grade:       'Expected 2025',
+    institution: 'Rajarata University of srilanka',
+    degree:      'Bachelor of  Information and Communication Technology(Hons)',
+    field:       'Information and Communication Technology',
+    grade:       'Expected 2026',
     start_date:  '2021-09',
-    end_date:    '2025-06',
+    end_date:    '2026-06',
     current:     true,
     description: 'Studying software engineering, web development, databases, networking, AI/ML, cybersecurity, and project management.',
     highlights:  [
@@ -18,7 +18,7 @@ const educationList = [
       'Active member of IT Society ATIT',
       'Dean\'s List recognition',
     ],
-    location:    'Sri Lanka',
+    location:    'Kegalla,Sri Lanka',
   },
 ];
 

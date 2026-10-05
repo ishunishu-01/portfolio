@@ -4,13 +4,14 @@ import {
   Send, CheckCircle, AlertCircle, Loader, MessageCircle
 } from 'lucide-react';
 import { GithubIcon, LinkedinIcon } from '../components/SocialIcons';
+import { messagesApi } from '../services/api';
 import './Contact.css';
 
 const contactInfo = [
   { icon: Mail,        label: 'Email',    value: 'ictishara076@gmail.com',  href: 'mailto:ictishara076@gmail.com' },
   { icon: MapPin,      label: 'Location', value: 'Sri Lanka',           href: null },
-  { icon: GithubIcon,  label: 'GitHub',   value: 'github.com/yourusername', href: 'https://github.com/yourusername' },
-  { icon: LinkedinIcon,label: 'LinkedIn', value: 'linkedin.com/in/yourusername', href: 'https://linkedin.com/in/yourusername' },
+  { icon: GithubIcon,  label: 'GitHub',   value: 'github.com/ishunishu-01', href: 'https://github.com/ishunishu-01' },
+  { icon: LinkedinIcon,label: 'LinkedIn', value: 'https://www.linkedin.com/in/ishara-nishshanka', href: 'https://www.linkedin.com/in/ishara-nishshanka-06831a356?utm_source=share_via&utm_content=profile&utm_medium=member_android' },
 ];
 
 export default function Contact() {
@@ -41,8 +42,12 @@ export default function Contact() {
 
     setStatus('loading');
     try {
-      // TODO: swap for real API call: await api.post('/messages', form)
-      await new Promise(res => setTimeout(res, 1500)); // simulated
+      await messagesApi.send({
+        name:    form.name,
+        email:   form.email,
+        subject: form.subject,
+        message: form.message,
+      });
       setStatus('success');
       setForm({ name: '', email: '', subject: '', message: '' });
     } catch {
