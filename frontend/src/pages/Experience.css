@@ -1,0 +1,152 @@
+/* Experience Timeline */
+.exp-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.exp-item {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 1.5rem;
+  position: relative;
+}
+
+/* Dot + line column */
+.exp-timeline-dot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 1.75rem;
+}
+
+.exp-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--bg-hover);
+  border: 2px solid var(--border-color);
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+
+.exp-dot--current {
+  background: var(--gold-400);
+  border-color: var(--gold-500);
+  box-shadow: 0 0 12px rgba(245,158,11,0.5);
+  animation: pulse-gold 2s ease-in-out infinite;
+}
+
+.exp-line {
+  flex: 1;
+  width: 2px;
+  background: var(--border-color);
+  margin-top: 4px;
+}
+
+/* Card */
+.exp-card {
+  margin-bottom: 2rem;
+  padding: 2rem;
+}
+
+.exp-card__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.exp-card__icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: var(--gold-glow);
+  border: 1px solid var(--border-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold-400);
+  flex-shrink: 0;
+}
+
+.exp-card__meta { flex: 1; }
+
+.exp-card__title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.2rem;
+}
+
+.exp-card__company {
+  font-size: 0.9rem;
+  color: var(--gold-400);
+  font-weight: 600;
+}
+
+.exp-card__current-badge {
+  background: var(--gradient-gold);
+  color: #0d1117;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 100px;
+  flex-shrink: 0;
+}
+
+.exp-card__info-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.exp-info-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.exp-card__desc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.75;
+  margin-bottom: 1.25rem;
+}
+
+/* Achievements */
+.exp-achievements {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.exp-achievement {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.exp-achievement svg { flex-shrink: 0; margin-top: 2px; }
+
+.exp-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+@media (max-width: 640px) {
+  .exp-item { grid-template-columns: 28px 1fr; gap: 1rem; }
+  .exp-card { padding: 1.5rem; }
+}

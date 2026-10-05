@@ -1,0 +1,52 @@
+# ===========================
+# IDE & Editor files
+# ===========================
+.idea/
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ===========================
+# Frontend (Vite / Node)
+# ===========================
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/*.local
+frontend/logs/
+frontend/*.log
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+# ===========================
+# Backend (Laravel / PHP)
+# ===========================
+backend/vendor/
+backend/node_modules/
+backend/.env
+backend/.env.backup
+backend/.env.production
+backend/public/build/
+backend/public/hot/
+backend/public/storage/
+backend/storage/*.key
+backend/storage/pail/
+backend/.phpunit.result.cache
+backend/.phpunit.cache/
+backend/auth.json
+backend/Homestead.json
+backend/Homestead.yaml
+backend/*.log
+
+# ===========================
+# Misc
+# ===========================
+*.log

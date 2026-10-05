@@ -1,0 +1,379 @@
+/* ── Certifications Grid ────────────────────────────────────── */
+.certs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.75rem;
+}
+
+/* ── Certificate Card ────────────────────────────────────────── */
+.cert-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.cert-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-gold-lg);
+}
+
+/* Thumbnail */
+.cert-thumb {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--bg-hover);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.cert-thumb__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.cert-card:hover .cert-thumb__img {
+  transform: scale(1.04);
+}
+
+/* Placeholder when image not yet added */
+.cert-thumb__placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  text-align: center;
+  background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-hover) 100%);
+}
+
+.cert-thumb__emoji {
+  font-size: 3.5rem;
+  line-height: 1;
+}
+
+.cert-thumb__hint {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.cert-thumb__hint code {
+  font-size: 0.68rem;
+  color: var(--gold-400);
+  word-break: break-all;
+}
+
+/* Overlay on hover */
+.cert-thumb__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.cert-thumb:hover .cert-thumb__overlay,
+.cert-thumb:focus-visible .cert-thumb__overlay {
+  opacity: 1;
+}
+
+/* Card body */
+.cert-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1.25rem 1.5rem 1.5rem;
+  flex: 1;
+}
+
+.cert-card__top {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cert-card__name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.35;
+}
+
+.cert-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-top: 0.1rem;
+}
+
+.cert-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.cert-card__id {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.cert-card__id code {
+  color: var(--gold-400);
+  font-size: 0.75rem;
+}
+
+/* Action buttons */
+.cert-card__actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color);
+  flex-wrap: wrap;
+}
+
+.cert-card__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--gold-400);
+  background: none;
+  border: 1px solid var(--border-gold);
+  padding: 0.4rem 0.85rem;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  font-family: inherit;
+}
+
+.cert-card__link:hover {
+  background: var(--gold-glow);
+  color: var(--gold-300);
+}
+
+.cert-card__link--verify {
+  color: var(--text-secondary);
+  border-color: var(--border-color);
+}
+
+.cert-card__link--verify:hover {
+  color: var(--gold-400);
+  border-color: var(--border-gold);
+  background: var(--gold-glow);
+}
+
+/* ── Lightbox ─────────────────────────────────────────────────── */
+.lightbox-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: fadeIn 0.2s ease;
+  outline: none;
+}
+
+.lightbox-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  max-width: 900px;
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-gold);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), var(--shadow-gold-lg);
+  animation: slideUp 0.25s ease;
+  max-height: 90vh;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)   scale(1); }
+}
+
+/* Close button */
+.lightbox-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 10;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--border-color);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.lightbox-close:hover {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: var(--border-gold);
+}
+
+/* Prev / Next navigation */
+.lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-60%);
+  z-index: 10;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--border-color);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.lightbox-nav:hover {
+  background: rgba(245, 158, 11, 0.25);
+  border-color: var(--border-gold);
+}
+
+.lightbox-nav--prev { left: 0.75rem; }
+.lightbox-nav--next { right: 0.75rem; }
+
+/* Image area */
+.lightbox-image-wrap {
+  position: relative;
+  background: #0d0d0d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 280px;
+  max-height: 55vh;
+  overflow: hidden;
+}
+
+.lightbox-image {
+  max-width: 100%;
+  max-height: 55vh;
+  object-fit: contain;
+  display: block;
+  position: relative;
+  z-index: 2;
+}
+
+/* Fallback shown under image if image fails */
+.lightbox-image-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem;
+  text-align: center;
+  z-index: 1;
+}
+
+/* The fallback is visible only when image fails (img hides it with z-index) */
+.lightbox-image-fallback p {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.lightbox-image-fallback code {
+  color: var(--gold-400);
+  font-size: 0.8rem;
+}
+
+.lightbox-fallback-emoji {
+  font-size: 3.5rem;
+}
+
+/* Info bar */
+.lightbox-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-card);
+  flex-wrap: wrap;
+}
+
+.lightbox-info__left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.lightbox-emoji { font-size: 1.5rem; line-height: 1; }
+
+.lightbox-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.lightbox-org {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.lightbox-info__right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.lightbox-counter {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .certs-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .lightbox-info {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

@@ -1,0 +1,33 @@
+/* Skills filter */
+.skills-filter {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.skills-filter__btn {
+  padding: 0.45rem 1.1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 100px;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  background: transparent;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.skills-filter__btn:hover {
+  border-color: var(--border-gold);
+  color: var(--gold-400);
+  background: var(--gold-glow);
+}
+
+.skills-filter__btn.active {
+  background: var(--gradient-gold);
+  color: #0d1117;
+  border-color: transparent;
+  box-shadow: var(--shadow-gold);
+}

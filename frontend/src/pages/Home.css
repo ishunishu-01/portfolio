@@ -1,0 +1,124 @@
+/* Home Page Styles */
+
+/* Highlights strip */
+.home-highlights { padding: 2.5rem 0; }
+
+.home-highlights__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
+
+.home-highlight-card {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.home-highlight-card__icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: var(--gold-glow);
+  border: 1px solid var(--border-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.25rem;
+}
+
+.home-highlight-card__num {
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.home-highlight-card__sub {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Section backgrounds */
+.home-projects { background: transparent; }
+
+.home-skills {
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.home-projects__cta {
+  display: flex;
+  justify-content: center;
+  margin-top: 2.5rem;
+}
+
+/* CTA Banner */
+.home-cta { }
+
+.home-cta__card {
+  position: relative;
+  background: var(--gradient-card);
+  border: 1px solid var(--border-gold);
+  border-radius: 24px;
+  padding: 5rem 3rem;
+  text-align: center;
+  overflow: hidden;
+  box-shadow: var(--shadow-gold);
+}
+
+.home-cta__bg-orb {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--gold-glow-lg) 0%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.home-cta__content {
+  position: relative;
+  z-index: 1;
+}
+
+.home-cta__title {
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  font-weight: 900;
+  margin: 0 auto 1rem;
+  max-width: 600px;
+}
+
+.home-cta__title span { color: var(--gold-400); }
+
+.home-cta__sub {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  max-width: 480px;
+  margin: 0 auto 2rem;
+  line-height: 1.7;
+}
+
+.home-cta__actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 900px) {
+  .home-highlights__grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 480px) {
+  .home-cta__card { padding: 3rem 1.5rem; }
+  .home-highlights__grid { grid-template-columns: repeat(2, 1fr); }
+}
