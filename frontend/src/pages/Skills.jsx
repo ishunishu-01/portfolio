@@ -1,41 +1,27 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import SkillCard from '../components/SkillCard';
-import { Zap, Filter } from 'lucide-react';
+import { Zap, Filter, Loader2 } from 'lucide-react';
+import { skillsApi } from '../services/api';
 import './Skills.css';
 
-const allSkills = [
-  /* Frontend */
-  { name: 'React',       category: 'Frontend',  level: 'Advanced'     },
-  { name: 'Next.js',     category: 'Frontend',  level: 'Intermediate' },
-  { name: 'JavaScript',  category: 'Frontend',  level: 'Advanced'     },
-  { name: 'TypeScript',  category: 'Frontend',  level: 'Intermediate' },
-  { name: 'Tailwind CSS',category: 'Frontend',  level: 'Advanced'     },
-  /* Backend */
-  { name: 'Laravel',     category: 'Backend',   level: 'Advanced'     },
-  { name: 'PHP',         category: 'Backend',   level: 'Advanced'     },
-  { name: 'Node.js',     category: 'Backend',   level: 'Intermediate' },
-  { name: 'REST API',    category: 'Backend',   level: 'Advanced'     },
-  { name: 'Python',      category: 'Backend',   level: 'Intermediate' },
-  /* Database */
-  { name: 'MySQL',       category: 'Database',  level: 'Advanced'     },
-  { name: 'Prisma',      category: 'Database',  level: 'Intermediate' },
-  /* DevOps / Tools */
-  { name: 'Git',         category: 'Tools',     level: 'Expert'       },
-  { name: 'Docker',      category: 'Tools',     level: 'Intermediate' },
-  { name: 'Postman',     category: 'Tools',     level: 'Advanced'     },
-  /* AI/ML */
-  { name: 'Machine Learning', category: 'AI/ML', level: 'Intermediate' },
-  { name: 'NLP',         category: 'AI/ML',     level: 'Beginner'     },
-];
-
-const categories = ['All', ...new Set(allSkills.map(s => s.category))];
-
 export default function Skills() {
-  const [active, setActive] = useState('All');
+  const [skills, setSkills]   = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState(null);
+  const [active, setActive]   = useState('All');
+
+  useEffect(() => {
+    skillsApi.getAll()
+      .then(res => setSkills(res.data))
+      .catch(() => setError('Failed to load skills. Please try again later.'))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const categories = ['All', ...new Set(skills.map(s => s.category).filter(Boolean))];
 
   const filtered = active === 'All'
-    ? allSkills
-    : allSkills.filter(s => s.category === active);
+    ? skills
+    : skills.filter(s => s.category === active);
 
   return (
     <main style={{ paddingTop: '5rem' }}>
@@ -51,27 +37,55 @@ export default function Skills() {
             <div className="divider" />
           </div>
 
-          {/* Filter tabs */}
-          <div className="skills-filter">
-            <Filter size={14} color="var(--text-muted)" />
-            {categories.map(cat => (
-              <button
-                key={cat}
-                className={`skills-filter__btn ${active === cat ? 'active' : ''}`}
-                onClick={() => setActive(cat)}
-                id={`skills-filter-${cat.toLowerCase()}`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
+          {/* Loading state */}
+          {loading && (
+            <div className="skills-loading">
+              <Loader2 size={32} className="spin" />
+              <p>Loading skills…</p>
+            </div>
+          )}
 
-          {/* Grid */}
-          <div className="grid-4" style={{ marginTop: '2rem' }}>
-            {filtered.map(skill => (
-              <SkillCard key={`${skill.name}-${skill.category}`} skill={skill} />
-            ))}
-          </div>
+          {/* Error state */}
+          {error && !loading && (
+            <div className="skills-empty">
+              <span>⚠️</span>
+              <p>{error}</p>
+            </div>
+          )}
+
+          {/* Content */}
+          {!loading && !error && (
+            <>
+              {/* Filter tabs */}
+              <div className="skills-filter">
+                <Filter size={14} color="var(--text-muted)" />
+                {categories.map(cat => (
+                  <button
+                    key={cat}
+                    className={`skills-filter__btn ${active === cat ? 'active' : ''}`}
+                    onClick={() => setActive(cat)}
+                    id={`skills-filter-${cat.toLowerCase().replace(/\//g, '-').replace(/ /g, '-')}`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+
+              {/* Grid */}
+              <div className="grid-4" style={{ marginTop: '2rem' }}>
+                {filtered.map(skill => (
+                  <SkillCard key={skill.id ?? `${skill.name}-${skill.category}`} skill={skill} />
+                ))}
+              </div>
+
+              {filtered.length === 0 && (
+                <div className="skills-empty">
+                  <span>🔍</span>
+                  <p>No skills found in this category.</p>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </section>
     </main>

@@ -1,9 +1,6 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { MessageSquare, Trash2, Eye, X, Mail, User, Clock, CheckCircle, Circle, Reply, Send, Loader } from 'lucide-react';
-
-const API = 'http://localhost:8000/api';
-const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('admin_token')}` });
+import { messagesApi } from '../../services/api';
 
 export default function AdminMessages() {
   const [items, setItems]       = useState([]);
@@ -19,7 +16,7 @@ export default function AdminMessages() {
   useEffect(() => { fetchMessages(); }, []);
 
   const fetchMessages = async () => {
-    try { const r = await axios.get(`${API}/messages`, { headers: headers() }); setItems(r.data); }
+    try { const r = await messagesApi.getAll(); setItems(r.data); }
     catch { showAlert('Failed to load messages.', 'error'); }
     finally { setLoading(false); }
   };
@@ -30,7 +27,7 @@ export default function AdminMessages() {
     setSelected(item);
     if (!item.is_read) {
       try {
-        await axios.put(`${API}/messages/${item.id}`, { is_read: true }, { headers: headers() });
+        await messagesApi.update(item.id, { is_read: true });
         setItems(prev => prev.map(m => m.id === item.id ? { ...m, is_read: true } : m));
       } catch {}
     }
@@ -39,7 +36,7 @@ export default function AdminMessages() {
   const handleDelete = async (id) => {
     if (!confirm('Delete this message?')) return;
     try {
-      await axios.delete(`${API}/messages/${id}`, { headers: headers() });
+      await messagesApi.delete(id);
       showAlert('Message deleted.');
       if (selected?.id === id) setSelected(null);
       fetchMessages();
@@ -56,11 +53,7 @@ export default function AdminMessages() {
     if (!replyBody.trim()) return;
     setReplySending(true);
     try {
-      await axios.post(
-        `${API}/messages/${replyTarget.id}/reply`,
-        { body: replyBody },
-        { headers: headers() }
-      );
+      await messagesApi.reply(replyTarget.id, { body: replyBody });
       // mark as read in UI
       setItems(prev => prev.map(m => m.id === replyTarget.id ? { ...m, is_read: true } : m));
       showAlert(`Reply sent to ${replyTarget.email}!`);

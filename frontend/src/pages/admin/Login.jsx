@@ -1,15 +1,15 @@
 import { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Lock, Mail, Eye, EyeOff } from 'lucide-react';
+import { Lock, Mail, Eye, EyeOff, ShieldCheck } from 'lucide-react';
+import { authApi } from '../../services/api';
 import './Admin.css';
 
 export default function Login() {
-  const [email, setEmail] = useState('');
+  const [email,    setEmail]    = useState('');
   const [password, setPassword] = useState('');
-  const [showPw, setShowPw] = useState(false);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [showPw,   setShowPw]   = useState(false);
+  const [error,    setError]    = useState(null);
+  const [loading,  setLoading]  = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -17,11 +17,14 @@ export default function Login() {
     setError(null);
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:8000/api/login', { email, password });
-      localStorage.setItem('admin_token', response.data.token);
-      navigate('/admin/profile');
+      const response = await authApi.login({ email, password });
+      localStorage.setItem('auth_token', response.data.token);
+      navigate('/admin/dashboard');
     } catch (err) {
-      setError('Invalid email or password. Please try again.');
+      const msg = err.response?.data?.message
+        || err.response?.data?.errors?.email?.[0]
+        || 'Invalid email or password. Please try again.';
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -31,7 +34,9 @@ export default function Login() {
     <div className="admin-login-container">
       <div className="admin-login-card">
         <div className="admin-login__logo">
-          <div className="admin-login__logo-icon">🛡️</div>
+          <div className="admin-login__logo-icon">
+            <ShieldCheck size={28} color="#0b0f1a" />
+          </div>
           <h2>Admin Panel</h2>
           <p>Sign in to manage your portfolio</p>
         </div>
@@ -44,31 +49,35 @@ export default function Login() {
 
         <form onSubmit={handleLogin} className="admin-form">
           <div className="form-group">
-            <label>Email Address</label>
+            <label htmlFor="login-email">Email Address</label>
             <div style={{ position: 'relative' }}>
               <Mail size={14} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#475569', pointerEvents: 'none' }} />
               <input
+                id="login-email"
                 type="email"
                 value={email}
-                placeholder="admin@example.com"
+                placeholder="admin@admin.com"
                 onChange={e => setEmail(e.target.value)}
                 style={{ paddingLeft: '2.25rem' }}
                 required
+                autoComplete="email"
               />
             </div>
           </div>
 
           <div className="form-group">
-            <label>Password</label>
+            <label htmlFor="login-password">Password</label>
             <div style={{ position: 'relative' }}>
               <Lock size={14} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#475569', pointerEvents: 'none' }} />
               <input
+                id="login-password"
                 type={showPw ? 'text' : 'password'}
                 value={password}
                 placeholder="••••••••"
                 onChange={e => setPassword(e.target.value)}
                 style={{ paddingLeft: '2.25rem', paddingRight: '2.75rem' }}
                 required
+                autoComplete="current-password"
               />
               <button
                 type="button"
@@ -80,8 +89,22 @@ export default function Login() {
             </div>
           </div>
 
-          <button type="submit" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '0.75rem', marginTop: '0.5rem' }} disabled={loading}>
-            {loading ? 'Signing in...' : 'Sign In'}
+          <div className="admin-login__hint">
+            Default: <strong>admin@admin.com</strong> / <strong>password123</strong>
+          </div>
+
+          <button
+            id="login-submit"
+            type="submit"
+            className="btn btn-primary"
+            style={{ width: '100%', justifyContent: 'center', padding: '0.75rem', marginTop: '0.5rem' }}
+            disabled={loading}
+          >
+            {loading ? (
+              <><div className="admin-spinner" style={{ width: 16, height: 16, borderWidth: 2 }} /> Signing in…</>
+            ) : (
+              <><ShieldCheck size={15} /> Sign In</>
+            )}
           </button>
         </form>
       </div>

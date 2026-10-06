@@ -1,9 +1,6 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Award, Plus, Pencil, Trash2, X, ExternalLink } from 'lucide-react';
-
-const API = 'http://localhost:8000/api';
-const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('admin_token')}` });
+import { certificationsApi } from '../../services/api';
 const EMPTY = { name: '', organization: '', issue_date: '', expiry_date: '', credential_id: '', certificate_url: '', certificate_image: '', category: 'General', icon: '', sort_order: 0 };
 const CATEGORIES = ['Frontend', 'Backend', 'AI / ML', 'DevOps', 'Design', 'IoT', 'QA / Testing', 'Quality Management', 'General'];
 
@@ -19,7 +16,7 @@ export default function AdminCertifications() {
   useEffect(() => { fetch(); }, []);
 
   const fetch = async () => {
-    try { const r = await axios.get(`${API}/certifications`); setItems(r.data); }
+    try { const r = await certificationsApi.getAll(); setItems(r.data); }
     catch { showAlert('Failed to load.', 'error'); }
     finally { setLoading(false); }
   };
@@ -33,8 +30,8 @@ export default function AdminCertifications() {
   const handleSave = async (e) => {
     e.preventDefault(); setSaving(true);
     try {
-      if (editing) await axios.put(`${API}/certifications/${editing.id}`, form, { headers: headers() });
-      else         await axios.post(`${API}/certifications`, form, { headers: headers() });
+      if (editing) await certificationsApi.update(editing.id, form);
+      else         await certificationsApi.create(form);
       showAlert(editing ? 'Updated!' : 'Added!');
       close(); fetch();
     } catch { showAlert('Save failed.', 'error'); }
@@ -43,7 +40,7 @@ export default function AdminCertifications() {
 
   const handleDelete = async (id) => {
     if (!confirm('Delete this certification?')) return;
-    try { await axios.delete(`${API}/certifications/${id}`, { headers: headers() }); showAlert('Deleted.'); fetch(); }
+    try { await certificationsApi.delete(id); showAlert('Deleted.'); fetch(); }
     catch { showAlert('Delete failed.', 'error'); }
   };
 

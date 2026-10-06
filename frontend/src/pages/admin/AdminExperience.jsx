@@ -1,10 +1,7 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Clock, Plus, Pencil, Trash2, X } from 'lucide-react';
-
-const API = 'http://localhost:8000/api';
-const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('admin_token')}` });
-const EMPTY = { company: '', position: '', description: '', start_date: '', end_date: '', is_current: false, location: '', sort_order: 0 };
+import { experiencesApi } from '../../services/api';
+const EMPTY = { company: '', position: '', description: '', achievements: '', start_date: '', end_date: '', is_current: false, location: '', sort_order: 0 };
 
 export default function AdminExperience() {
   const [items, setItems]     = useState([]);
@@ -18,7 +15,7 @@ export default function AdminExperience() {
   useEffect(() => { fetch(); }, []);
 
   const fetch = async () => {
-    try { const r = await axios.get(`${API}/experiences`); setItems(r.data); }
+    try { const r = await experiencesApi.getAll(); setItems(r.data); }
     catch { showAlert('Failed to load.', 'error'); }
     finally { setLoading(false); }
   };
@@ -36,8 +33,8 @@ export default function AdminExperience() {
   const handleSave = async (e) => {
     e.preventDefault(); setSaving(true);
     try {
-      if (editing) await axios.put(`${API}/experiences/${editing.id}`, form, { headers: headers() });
-      else         await axios.post(`${API}/experiences`, form, { headers: headers() });
+      if (editing) await experiencesApi.update(editing.id, form);
+      else         await experiencesApi.create(form);
       showAlert(editing ? 'Updated!' : 'Added!');
       close(); fetch();
     } catch { showAlert('Save failed.', 'error'); }
@@ -46,7 +43,7 @@ export default function AdminExperience() {
 
   const handleDelete = async (id) => {
     if (!confirm('Delete this experience?')) return;
-    try { await axios.delete(`${API}/experiences/${id}`, { headers: headers() }); showAlert('Deleted.'); fetch(); }
+    try { await experiencesApi.delete(id); showAlert('Deleted.'); fetch(); }
     catch { showAlert('Delete failed.', 'error'); }
   };
 
@@ -147,6 +144,10 @@ export default function AdminExperience() {
                   <div className="form-group">
                     <label>Description</label>
                     <textarea name="description" value={form.description || ''} onChange={handleChange} rows={4} placeholder="Describe your responsibilities and achievements..." />
+                  </div>
+                  <div className="form-group">
+                    <label>Achievements <span style={{fontSize:'0.75rem',color:'#64748b'}}>(one per line)</span></label>
+                    <textarea name="achievements" value={form.achievements || ''} onChange={handleChange} rows={4} placeholder={`Built X using Y\nDelivered Z for client`} />
                   </div>
                   <label className="form-checkbox-row">
                     <input type="checkbox" name="is_current" checked={!!form.is_current} onChange={handleChange} />

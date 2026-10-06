@@ -6,6 +6,18 @@ use Illuminate\Http\Request;
 
 class EducationController extends Controller
 {
+    private function prepareData(Request $request): array
+    {
+        $data = $request->all();
+
+        // Ensure is_current is boolean
+        if (isset($data['is_current'])) {
+            $data['is_current'] = filter_var($data['is_current'], FILTER_VALIDATE_BOOLEAN);
+        }
+
+        return $data;
+    }
+
     public function index()
     {
         return response()->json(\App\Models\Education::orderBy('sort_order')->get());
@@ -13,7 +25,7 @@ class EducationController extends Controller
 
     public function store(Request $request)
     {
-        $education = \App\Models\Education::create($request->all());
+        $education = \App\Models\Education::create($this->prepareData($request));
         return response()->json($education, 201);
     }
 
@@ -25,7 +37,7 @@ class EducationController extends Controller
     public function update(Request $request, string $id)
     {
         $education = \App\Models\Education::findOrFail($id);
-        $education->update($request->all());
+        $education->update($this->prepareData($request));
         return response()->json($education);
     }
 

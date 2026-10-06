@@ -1,10 +1,6 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Briefcase, Plus, Pencil, Trash2, X, Star, ExternalLink, Link } from 'lucide-react';
-
-const API = 'http://localhost:8000/api';
-const token = () => localStorage.getItem('admin_token');
-const headers = () => ({ Authorization: `Bearer ${token()}` });
+import { projectsApi } from '../../services/api';
 
 const EMPTY = {
   title: '', description: '', technologies: '',
@@ -26,7 +22,7 @@ export default function AdminProjects() {
 
   const fetch = async () => {
     try {
-      const res = await axios.get(`${API}/projects`);
+      const res = await projectsApi.getAll();
       setItems(res.data);
     } catch { showAlert('Failed to load projects.', 'error'); }
     finally { setLoading(false); }
@@ -55,10 +51,10 @@ export default function AdminProjects() {
     };
     try {
       if (editing) {
-        await axios.put(`${API}/projects/${editing.id}`, payload, { headers: headers() });
+        await projectsApi.update(editing.id, payload);
         showAlert('Project updated!');
       } else {
-        await axios.post(`${API}/projects`, payload, { headers: headers() });
+        await projectsApi.create(payload);
         showAlert('Project added!');
       }
       closeModal();
@@ -70,7 +66,7 @@ export default function AdminProjects() {
   const handleDelete = async (id) => {
     if (!confirm('Delete this project?')) return;
     try {
-      await axios.delete(`${API}/projects/${id}`, { headers: headers() });
+      await projectsApi.delete(id);
       showAlert('Project deleted.');
       fetch();
     } catch { showAlert('Delete failed.', 'error'); }

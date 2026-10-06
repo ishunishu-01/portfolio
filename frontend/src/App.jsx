@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -14,6 +14,7 @@ import Contact       from './pages/Contact';
 // Admin imports
 import Login                from './pages/admin/Login';
 import AdminLayout          from './pages/admin/AdminLayout';
+import AdminDashboard       from './pages/admin/AdminDashboard';
 import AdminProfile         from './pages/admin/AdminProfile';
 import AdminProjects        from './pages/admin/AdminProjects';
 import AdminSkills          from './pages/admin/AdminSkills';
@@ -65,6 +66,9 @@ export default function App() {
         {/* Admin Routes (No Navbar/Footer) */}
         <Route path="/admin/login" element={<Login />} />
         <Route path="/admin" element={<AdminLayout />}>
+          {/* Redirect /admin → /admin/dashboard */}
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard"      element={<AdminDashboard />} />
           <Route path="profile"        element={<AdminProfile />} />
           <Route path="projects"       element={<AdminProjects />} />
           <Route path="skills"         element={<AdminSkills />} />

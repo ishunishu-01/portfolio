@@ -7,7 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 class Education extends Model
 {
     protected $fillable = [
-        'institution', 'degree', 'field', 'start_date', 'end_date',
-        'grade', 'description', 'sort_order',
+        'institution', 'degree', 'field_of_study', 'start_date', 'end_date',
+        'grade', 'description', 'sort_order', 'is_current', 'highlights',
+    ];
+
+    protected $casts = [
+        'is_current' => 'boolean',
+        'highlights' => 'array',
     ];
 }

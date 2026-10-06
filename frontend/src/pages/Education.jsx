@@ -1,26 +1,7 @@
-import { GraduationCap, Calendar, MapPin, BookOpen } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { GraduationCap, Calendar, MapPin, BookOpen, Loader2 } from 'lucide-react';
+import { educationApi } from '../services/api';
 import './Education.css';
-
-const educationList = [
-  {
-    id: 1,
-    institution: 'Rajarata University of srilanka',
-    degree:      'Bachelor of  Information and Communication Technology(Hons)',
-    field:       'Information and Communication Technology',
-    grade:       'Expected 2026',
-    start_date:  '2021-09',
-    end_date:    '2026-06',
-    current:     true,
-    description: 'Studying software engineering, web development, databases, networking, AI/ML, cybersecurity, and project management.',
-    highlights:  [
-      'Specialization in Software Engineering & AI',
-      'Final Year Project: AI-Based OSINT Privacy Risk Assessment',
-      'Active member of IT Society ATIT',
-      'Dean\'s List recognition',
-    ],
-    location:    'Kegalla,Sri Lanka',
-  },
-];
 
 function formatDate(dateStr, isCurrent) {
   if (isCurrent) return 'Present';
@@ -31,6 +12,17 @@ function formatDate(dateStr, isCurrent) {
 }
 
 export default function Education() {
+  const [educationList, setEducationList] = useState([]);
+  const [loading, setLoading]             = useState(true);
+  const [error, setError]                 = useState(null);
+
+  useEffect(() => {
+    educationApi.getAll()
+      .then(res => setEducationList(res.data))
+      .catch(() => setError('Failed to load education. Please try again later.'))
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <main style={{ paddingTop: '5rem' }}>
       <section className="section">
@@ -45,54 +37,86 @@ export default function Education() {
             <div className="divider" />
           </div>
 
+          {/* Loading state */}
+          {loading && (
+            <div className="edu-loading">
+              <Loader2 size={32} className="spin" />
+              <p>Loading education…</p>
+            </div>
+          )}
+
+          {/* Error state */}
+          {error && !loading && (
+            <div className="edu-empty">
+              <span>⚠️</span>
+              <p>{error}</p>
+            </div>
+          )}
+
           {/* Education cards */}
-          <div className="edu-list">
-            {educationList.map(edu => (
-              <article className="edu-card card" key={edu.id}>
-                <div className="edu-card__left">
-                  <div className="edu-card__icon">
-                    <GraduationCap size={28} />
-                  </div>
-                  {edu.current && (
-                    <span className="edu-card__current">Ongoing</span>
-                  )}
-                  <div className="edu-card__dates">
-                    <Calendar size={13} />
-                    <span>{formatDate(edu.start_date, false)} — {formatDate(edu.end_date, edu.current)}</span>
-                  </div>
+          {!loading && !error && (
+            <div className="edu-list">
+              {educationList.length === 0 && (
+                <div className="edu-empty">
+                  <span>📂</span>
+                  <p>No education entries yet.</p>
                 </div>
+              )}
+              {educationList.map(edu => {
+                const highlights = Array.isArray(edu.highlights)
+                  ? edu.highlights
+                  : (edu.highlights ? edu.highlights.split('\n').filter(Boolean) : []);
 
-                <div className="edu-card__right">
-                  <h2 className="edu-card__degree">{edu.degree}</h2>
-                  <div className="edu-card__institution">
-                    <BookOpen size={14} />
-                    {edu.institution}
-                  </div>
-                  <div className="edu-card__meta">
-                    <span className="edu-meta-chip">
-                      <MapPin size={12} />{edu.location}
-                    </span>
-                    <span className="edu-meta-chip" style={{ color: 'var(--gold-400)' }}>
-                      🎓 {edu.grade}
-                    </span>
-                  </div>
+                return (
+                  <article className="edu-card card" key={edu.id}>
+                    <div className="edu-card__left">
+                      <div className="edu-card__icon">
+                        <GraduationCap size={28} />
+                      </div>
+                      {edu.current && (
+                        <span className="edu-card__current">Ongoing</span>
+                      )}
+                      <div className="edu-card__dates">
+                        <Calendar size={13} />
+                        <span>{formatDate(edu.start_date, false)} — {formatDate(edu.end_date, edu.current)}</span>
+                      </div>
+                    </div>
 
-                  <p className="edu-card__desc">{edu.description}</p>
+                    <div className="edu-card__right">
+                      <h2 className="edu-card__degree">{edu.degree}</h2>
+                      <div className="edu-card__institution">
+                        <BookOpen size={14} />
+                        {edu.institution}
+                      </div>
+                      <div className="edu-card__meta">
+                        <span className="edu-meta-chip">
+                          <MapPin size={12} />{edu.location}
+                        </span>
+                        {edu.grade && (
+                          <span className="edu-meta-chip" style={{ color: 'var(--gold-400)' }}>
+                            🎓 {edu.grade}
+                          </span>
+                        )}
+                      </div>
 
-                  {edu.highlights && (
-                    <ul className="edu-highlights">
-                      {edu.highlights.map((h, i) => (
-                        <li key={i} className="edu-highlight">
-                          <span className="edu-highlight__dot" />
-                          {h}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              </article>
-            ))}
-          </div>
+                      <p className="edu-card__desc">{edu.description}</p>
+
+                      {highlights.length > 0 && (
+                        <ul className="edu-highlights">
+                          {highlights.map((h, i) => (
+                            <li key={i} className="edu-highlight">
+                              <span className="edu-highlight__dot" />
+                              {h}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
     </main>

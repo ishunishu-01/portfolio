@@ -1,9 +1,6 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Zap, Plus, Pencil, Trash2, X } from 'lucide-react';
-
-const API = 'http://localhost:8000/api';
-const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('admin_token')}` });
+import { skillsApi } from '../../services/api';
 
 const LEVELS = ['Beginner', 'Intermediate', 'Advanced', 'Expert'];
 const CATEGORIES = ['Frontend', 'Backend', 'Database', 'DevOps', 'AI / ML', 'Design', 'Tools', 'Other'];
@@ -21,7 +18,7 @@ export default function AdminSkills() {
   useEffect(() => { fetch(); }, []);
 
   const fetch = async () => {
-    try { const r = await axios.get(`${API}/skills`); setItems(r.data); }
+    try { const r = await skillsApi.getAll(); setItems(r.data); }
     catch { showAlert('Failed to load.', 'error'); }
     finally { setLoading(false); }
   };
@@ -35,8 +32,8 @@ export default function AdminSkills() {
   const handleSave = async (e) => {
     e.preventDefault(); setSaving(true);
     try {
-      if (editing) await axios.put(`${API}/skills/${editing.id}`, form, { headers: headers() });
-      else         await axios.post(`${API}/skills`, form, { headers: headers() });
+      if (editing) await skillsApi.update(editing.id, form);
+      else         await skillsApi.create(form);
       showAlert(editing ? 'Skill updated!' : 'Skill added!');
       close(); fetch();
     } catch { showAlert('Save failed.', 'error'); }
@@ -45,7 +42,7 @@ export default function AdminSkills() {
 
   const handleDelete = async (id) => {
     if (!confirm('Delete this skill?')) return;
-    try { await axios.delete(`${API}/skills/${id}`, { headers: headers() }); showAlert('Deleted.'); fetch(); }
+    try { await skillsApi.delete(id); showAlert('Deleted.'); fetch(); }
     catch { showAlert('Delete failed.', 'error'); }
   };
 

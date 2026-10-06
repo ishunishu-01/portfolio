@@ -1,9 +1,6 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { GraduationCap, Plus, Pencil, Trash2, X } from 'lucide-react';
-
-const API = 'http://localhost:8000/api';
-const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('admin_token')}` });
+import { educationApi } from '../../services/api';
 const EMPTY = { institution: '', degree: '', field_of_study: '', start_date: '', end_date: '', is_current: false, grade: '', description: '', sort_order: 0 };
 
 export default function AdminEducation() {
@@ -18,7 +15,7 @@ export default function AdminEducation() {
   useEffect(() => { fetch(); }, []);
 
   const fetch = async () => {
-    try { const r = await axios.get(`${API}/education`); setItems(r.data); }
+    try { const r = await educationApi.getAll(); setItems(r.data); }
     catch { showAlert('Failed to load.', 'error'); }
     finally { setLoading(false); }
   };
@@ -36,8 +33,8 @@ export default function AdminEducation() {
   const handleSave = async (e) => {
     e.preventDefault(); setSaving(true);
     try {
-      if (editing) await axios.put(`${API}/education/${editing.id}`, form, { headers: headers() });
-      else         await axios.post(`${API}/education`, form, { headers: headers() });
+      if (editing) await educationApi.update(editing.id, form);
+      else         await educationApi.create(form);
       showAlert(editing ? 'Updated!' : 'Added!');
       close(); fetch();
     } catch { showAlert('Save failed.', 'error'); }
@@ -46,7 +43,7 @@ export default function AdminEducation() {
 
   const handleDelete = async (id) => {
     if (!confirm('Delete this education entry?')) return;
-    try { await axios.delete(`${API}/education/${id}`, { headers: headers() }); showAlert('Deleted.'); fetch(); }
+    try { await educationApi.delete(id); showAlert('Deleted.'); fetch(); }
     catch { showAlert('Delete failed.', 'error'); }
   };
 
