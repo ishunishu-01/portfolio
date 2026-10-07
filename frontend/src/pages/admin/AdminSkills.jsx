@@ -61,7 +61,7 @@ export default function AdminSkills() {
       <div className="admin-topbar">
         <div className="admin-topbar__title">
           <h1>Skills</h1>
-          <p>Manage your technical skills</p>
+          <p>Manage my technical skills</p>
         </div>
         <div className="admin-topbar__actions">
           <button className="btn btn-primary" onClick={openAdd}><Plus size={15} /> Add Skill</button>

@@ -80,7 +80,7 @@ export default function AdminProjects() {
       <div className="admin-topbar">
         <div className="admin-topbar__title">
           <h1>Projects</h1>
-          <p>Manage your portfolio projects</p>
+          <p>Manage my portfolio projects</p>
         </div>
         <div className="admin-topbar__actions">
           <button className="btn btn-primary" onClick={openAdd}>

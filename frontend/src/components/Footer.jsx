@@ -129,7 +129,7 @@ export default function Footer() {
         {/* Bottom */}
         <div className="footer__bottom">
           <p className="footer__copy">
-            © {year} <span>S.P. Ishara Sewwandi Nishshanka</span>. All rights reserved.
+            © {year} <span>S.P. Ishara S. Nishshanka</span>. All rights reserved.
           </p>
           <p className="footer__made">
             Made with <Heart size={12} className="heart" /> using{' '}

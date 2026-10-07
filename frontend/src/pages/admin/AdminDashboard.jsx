@@ -67,7 +67,7 @@ export default function AdminDashboard() {
       <div className="admin-topbar">
         <div className="admin-topbar__title">
           <h1>Dashboard</h1>
-          <p>Welcome back — here's an overview of your portfolio</p>
+          <p>Here's an overview of Ishara's portfolio</p>
         </div>
         <div className="admin-topbar__actions">
           {unread > 0 && (

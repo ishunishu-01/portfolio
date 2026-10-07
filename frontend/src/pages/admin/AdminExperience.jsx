@@ -54,7 +54,7 @@ export default function AdminExperience() {
       <div className="admin-topbar">
         <div className="admin-topbar__title">
           <h1>Experience</h1>
-          <p>Manage your work experience</p>
+          <p>Manage my work experience</p>
         </div>
         <div className="admin-topbar__actions">
           <button className="btn btn-primary" onClick={openAdd}><Plus size={15} /> Add Experience</button>

@@ -66,7 +66,7 @@ export default function AdminProfile() {
       <div className="admin-topbar">
         <div className="admin-topbar__title">
           <h1>Profile &amp; About</h1>
-          <p>Update your public portfolio information</p>
+          <p>Update my public portfolio information</p>
         </div>
         <div className="admin-topbar__actions">
           <button className="btn btn-secondary" onClick={fetchProfile} disabled={loading}>

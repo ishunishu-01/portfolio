@@ -51,7 +51,7 @@ export default function AdminCertifications() {
       <div className="admin-topbar">
         <div className="admin-topbar__title">
           <h1>Certifications</h1>
-          <p>Manage your certificates and credentials</p>
+          <p>Manage my certificates and credentials</p>
         </div>
         <div className="admin-topbar__actions">
           <button className="btn btn-primary" onClick={openAdd}><Plus size={15} /> Add Certification</button>
