@@ -94,12 +94,12 @@ export const certificationsApi = {
 
 // ── Messages ───────────────────────────────────────────────────
 export const messagesApi = {
-  send:    (data)       => api.post('/messages', data),
+  send:    (data)       => api.post('/messages', data, { headers: { 'Content-Type': 'multipart/form-data' } }),
   getAll:  ()           => api.get('/messages'),
   getOne:  (id)         => api.get(`/messages/${id}`),
   update:  (id, data)   => api.put(`/messages/${id}`, data),
   delete:  (id)         => api.delete(`/messages/${id}`),
-  reply:   (id, data)   => api.post(`/messages/${id}/reply`, data),
+  reply:   (id, data)   => api.post(`/messages/${id}/reply`, data, { headers: { 'Content-Type': 'multipart/form-data' } }),
 };
 
 // ── Dashboard Stats ────────────────────────────────────────────

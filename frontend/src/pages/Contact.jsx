@@ -15,7 +15,7 @@ const contactInfo = [
 ];
 
 export default function Contact() {
-  const [form, setForm]     = useState({ name: '', email: '', subject: '', message: '' });
+  const [form, setForm]     = useState({ name: '', email: '', subject: '', message: '', attachment: null });
   const [status, setStatus] = useState(null); // null | 'loading' | 'success' | 'error'
   const [errors, setErrors] = useState({});
 
@@ -35,6 +35,10 @@ export default function Contact() {
     if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
   };
 
+  const handleFileChange = e => {
+    setForm(f => ({ ...f, attachment: e.target.files[0] }));
+  };
+
   const handleSubmit = async e => {
     e.preventDefault();
     const errs = validate();
@@ -42,14 +46,21 @@ export default function Contact() {
 
     setStatus('loading');
     try {
-      await messagesApi.send({
-        name:    form.name,
-        email:   form.email,
-        subject: form.subject,
-        message: form.message,
-      });
+      const formData = new FormData();
+      formData.append('name', form.name);
+      formData.append('email', form.email);
+      formData.append('subject', form.subject);
+      formData.append('message', form.message);
+      if (form.attachment) {
+        formData.append('attachment', form.attachment);
+      }
+
+      await messagesApi.send(formData);
       setStatus('success');
-      setForm({ name: '', email: '', subject: '', message: '' });
+      setForm({ name: '', email: '', subject: '', message: '', attachment: null });
+      if (document.getElementById('contact-attachment')) {
+        document.getElementById('contact-attachment').value = '';
+      }
     } catch {
       setStatus('error');
     }
@@ -174,6 +185,18 @@ export default function Contact() {
                       style={{ resize: 'vertical', lineHeight: '1.6' }}
                     />
                     {errors.message && <span className="field-error">{errors.message}</span>}
+                  </div>
+
+                  <div className="contact-form__field">
+                    <label htmlFor="contact-attachment" className="field-label">Attachment (Optional)</label>
+                    <input
+                      id="contact-attachment"
+                      name="attachment"
+                      type="file"
+                      className="input"
+                      onChange={handleFileChange}
+                      style={{ padding: '0.6rem', color: '#cbd5e1' }}
+                    />
                   </div>
 
                   {status === 'error' && (

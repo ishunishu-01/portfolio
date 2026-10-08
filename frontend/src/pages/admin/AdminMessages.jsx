@@ -11,6 +11,7 @@ export default function AdminMessages() {
   // Reply modal state
   const [replyTarget, setReplyTarget] = useState(null); // message to reply to
   const [replyBody, setReplyBody]     = useState('');
+  const [replyAttachment, setReplyAttachment] = useState(null);
   const [replySending, setReplySending] = useState(false);
 
   useEffect(() => { fetchMessages(); }, []);
@@ -46,6 +47,7 @@ export default function AdminMessages() {
   const openReply = (item) => {
     setReplyTarget(item);
     setReplyBody('');
+    setReplyAttachment(null);
     setSelected(null); // close read modal if open
   };
 
@@ -53,12 +55,19 @@ export default function AdminMessages() {
     if (!replyBody.trim()) return;
     setReplySending(true);
     try {
-      await messagesApi.reply(replyTarget.id, { body: replyBody });
+      const formData = new FormData();
+      formData.append('body', replyBody);
+      if (replyAttachment) {
+        formData.append('attachment', replyAttachment);
+      }
+
+      await messagesApi.reply(replyTarget.id, formData);
       // mark as read in UI
       setItems(prev => prev.map(m => m.id === replyTarget.id ? { ...m, is_read: true } : m));
       showAlert(`Reply sent to ${replyTarget.email}!`);
       setReplyTarget(null);
       setReplyBody('');
+      setReplyAttachment(null);
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to send reply. Check mail config.';
       showAlert(msg, 'error');
@@ -149,6 +158,14 @@ export default function AdminMessages() {
                 <div className="msg-meta-row"><Clock size={13} /><strong>Received:</strong> {fmtDate(selected.created_at)}</div>
               </div>
               <div className="msg-detail">{selected.message}</div>
+              {selected.attachment && (
+                <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
+                  <strong>Attachment: </strong>
+                  <a href={`${import.meta.env.VITE_API_URL?.replace('/api', '') ?? 'http://127.0.0.1:8000'}/storage/${selected.attachment}`} target="_blank" rel="noreferrer" style={{ color: '#d4af37', textDecoration: 'underline' }}>
+                    View / Download
+                  </a>
+                </div>
+              )}
             </div>
             <div className="admin-modal__footer">
               <button className="btn btn-danger" onClick={() => handleDelete(selected.id)}><Trash2 size={14} /> Delete</button>
@@ -217,6 +234,22 @@ export default function AdminMessages() {
                 }}
                 onFocus={e => e.target.style.borderColor = '#d4af37'}
                 onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+              />
+
+              <label style={{ fontSize: '0.8rem', fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.4rem', marginTop: '1rem' }}>
+                Attachment (Optional)
+              </label>
+              <input
+                type="file"
+                onChange={e => setReplyAttachment(e.target.files[0])}
+                style={{
+                  width: '100%',
+                  padding: '0.5rem',
+                  background: 'var(--admin-bg)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: '6px',
+                  color: '#e2e8f0',
+                }}
               />
             </div>
 

@@ -16,6 +16,7 @@ class MessageReply extends Mailable
         public string $recipientName,
         public string $originalSubject,
         public string $replyBody,
+        public ?string $attachmentPath = null,
     ) {}
 
     public function envelope(): Envelope
@@ -30,5 +31,14 @@ class MessageReply extends Mailable
         return new Content(
             markdown: 'emails.message-reply',
         );
+    }
+
+    public function attachments(): array
+    {
+        $attachments = [];
+        if ($this->attachmentPath) {
+            $attachments[] = \Illuminate\Mail\Mailables\Attachment::fromStorage($this->attachmentPath);
+        }
+        return $attachments;
     }
 }

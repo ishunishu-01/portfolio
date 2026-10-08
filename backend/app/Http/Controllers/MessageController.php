@@ -15,7 +15,11 @@ class MessageController extends Controller
 
     public function store(Request $request)
     {
-        $message = \App\Models\Message::create($request->all());
+        $data = $request->all();
+        if ($request->hasFile('attachment')) {
+            $data['attachment'] = $request->file('attachment')->store('attachments', 'public');
+        }
+        $message = \App\Models\Message::create($data);
         return response()->json($message, 201);
     }
 
@@ -46,10 +50,16 @@ class MessageController extends Controller
 
         $message = \App\Models\Message::findOrFail($id);
 
+        $attachmentPath = null;
+        if ($request->hasFile('attachment')) {
+            $attachmentPath = $request->file('attachment')->store('reply_attachments');
+        }
+
         Mail::to($message->email)->send(new MessageReply(
             recipientName:   $message->name,
             originalSubject: $message->subject ?? 'Your message',
             replyBody:       $request->input('body'),
+            attachmentPath:  $attachmentPath,
         ));
 
         // Mark as read after replying
