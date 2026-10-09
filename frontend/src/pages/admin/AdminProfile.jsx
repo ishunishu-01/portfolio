@@ -34,7 +34,12 @@ export default function AdminProfile() {
   };
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    let { name, value, type, checked } = e.target;
+    
+    if (name === 'phone') {
+      value = value.replace(/[^0-9+]/g, '');
+    }
+    
     setProfile(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
 
